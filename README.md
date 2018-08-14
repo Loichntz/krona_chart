@@ -5,9 +5,9 @@ Il s'agit de la dernière étape du script principal. Ce dernier script fait int
 
 Pour construire les krona_charts, il suffit d'avoir dans le même répertoire le répertoire krona_pack_tsv contenant tous les scripts nécessaires et le fichier tsv que l'on souhaite traiter, et faire appel au script tsv_to_krona. Le script retournera alors les fichiers html attendus dans un répertoire intitulé "krona_charts".
 
-## Mise en forme du fichier tsv
-
-'''bash
+## Mise en forme du fichier avant traitement 
+Voici le script permettant de mettre en forme le fichier tsv en entrée afin qu'il puisse être utilisé dans un second temps pour générer les krona charts.
+```bash
 mkdir -p mise_en_forme_krona
 sed 1d ${file} > mise_en_forme_krona/table_fl_removed.txt 
 sed 's/#//g' mise_en_forme_krona/table_fl_removed.txt > mise_en_forme_krona/table_sans_diese.txt
@@ -20,5 +20,22 @@ sed 's/;*$//g' mise_en_forme_krona/taxonomie_R_ssgui_sspts.tsv > mise_en_forme_k
 sed 's/k__//g' mise_en_forme_krona/taxonomie_R_ssgui_sspts_nivir.tsv > mise_en_forme_krona/taxonomie_R_propre.tsv
 
 bash krona_pack_tsv/traitement_krona.sh mise_en_forme_krona/taxonomie_R_propre.tsv krona_charts/ 
+```
 
-'''
+```bash
+mkdir -p mise_en_forme_krona
+```
+Les différentes étapes de modification seront enregistrées en tant que fichiers intermédiaires dans le répertoire **mise_en_forme_krona**.
+
+```bash
+sed 1d ${file} > mise_en_forme_krona/table_fl_removed.txt
+```
+La première étape est la suppression de la première ligne du fichier, cette ligne ne sera certes pas exploitée dans la suite du programme et donc, pas nécessaire.
+
+```bash
+sed 's/#//g' mise_en_forme_krona/table_fl_removed.txt > mise_en_forme_krona/table_sans_diese.txt
+```
+La deuxième modification est la suppression des # dans le fichier. En effet, cela me permet de récupérer les noms des différentes colonnes du fichier, colonnes qui me serviront lors du traitement sur R.
+```bash
+Rscript krona_pack_tsv/R_mef_tsv.R mise_en_forme_krona/table_sans_diese.txt mise_en_forme_krona/taxonomie_R.tsv
+```
